@@ -798,7 +798,7 @@
 
         <section class="lookbook-3d" aria-label="Galerie produit 3D">
             <p class="galleryTitle">Galerie 3D</p>
-            <h1>Découvrez notre collection</h1>
+            <div class="image-container" id="rotating-lookbook">
                 {% for item in lookbookItems %}
                     {% set basePrice = item.price is not null ? item.price + 0 : defaultPrice %}
                     {% set finalPrice = item.promoPercent is not null ? basePrice * (1 - item.promoPercent/100) : basePrice %}
