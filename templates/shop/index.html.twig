@@ -567,6 +567,71 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(34,211,238,0.35); }
             50% { box-shadow: 0 0 0 16px rgba(34,211,238,0); }
         }
+        /* Rotating 3D gallery pour le lookbook produit */
+        .lookbook-3d {
+            margin: 60px auto 20px;
+            display: grid;
+            place-items: center;
+            gap: 14px;
+            max-width: 520px;
+            padding: 20px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.82), rgba(226, 232, 240, 0.75));
+            box-shadow: 0 24px 64px rgba(15,23,42,0.12), 0 0 0 1px rgba(255,255,255,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .lookbook-3d .galleryTitle {
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            color: var(--accent-3);
+            text-transform: uppercase;
+        }
+        .lookbook-3d .image-container {
+            width: min(320px, 70vw);
+            height: min(320px, 70vw);
+            transform-style: preserve-3d;
+            transform: perspective(1200px) rotateY(0deg);
+            transition: transform 0.7s;
+            position: relative;
+        }
+        .lookbook-3d .image-container span {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            transform: rotateY(calc(var(--i) * 90deg)) translateZ(360px);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+        }
+        .lookbook-3d .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(60%);
+            transition: filter 0.25s ease, transform 0.25s ease;
+        }
+        .lookbook-3d .image-container img:hover { filter: none; transform: scale(1.02); }
+        .lookbook-3d .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .lookbook-3d .btn-3d {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, var(--accent-3), var(--accent-2));
+            color: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(37,99,235,0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .lookbook-3d .btn-3d:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(37,99,235,0.35); }
     </style>
 {% endblock %}
 
@@ -660,6 +725,21 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="lookbook-3d" aria-label="Lookbook produit 3D">
+            <p class="galleryTitle">Lookbook 3D</p>
+            <div class="image-container" id="rotating-lookbook">
+                {% for img in heroImages|slice(0, 4) %}
+                    <span style="--i: {{ loop.index0 }}">
+                        <img src="{{ img }}" alt="Lookbook angle {{ loop.index }}">
+                    </span>
+                {% endfor %}
+            </div>
+            <div class="btn-container">
+                <button class="btn-3d" type="button" id="lookbook-prev">⟲ Précédent</button>
+                <button class="btn-3d" type="button" id="lookbook-next">Suivant ⟳</button>
             </div>
         </section>
 
@@ -797,12 +877,18 @@
             const nextBtn = document.getElementById('next-btn');
             const descBtn = document.getElementById('desc-btn');
             const descPanel = document.getElementById('desc-panel');
+            const rotatingEl = document.getElementById('rotating-lookbook');
+            const rotatePrev = document.getElementById('lookbook-prev');
+            const rotateNext = document.getElementById('lookbook-next');
 
             const featuredName = "{{ (featured and featured.name ? featured.name : fallbackNamePlain)|e('js') }}";
             const featuredPrice = parseFloat("{{ heroFinalPrice|number_format(2, '.', '') }}") || 0;
             const gallery = {{ heroImages|json_encode|raw }};
+            const rotatingItems = Array.from(rotatingEl ? rotatingEl.querySelectorAll('span') : []);
             let currentIndex = 0;
             const maxQuantity = 5;
+            let rotation = 0;
+            let rotationTimer;
 
             function refreshHeroPrice() {
                 if (!heroPriceEl || !qtyInput) return;
@@ -830,6 +916,31 @@
             if (prevBtn) prevBtn.addEventListener('click', () => switchImage(currentIndex - 1));
             if (nextBtn) nextBtn.addEventListener('click', () => switchImage(currentIndex + 1));
             renderThumbs();
+
+            // Rotating 3D lookbook
+            function updateRotation() {
+                if (!rotatingEl || rotatingItems.length === 0) return;
+                rotatingEl.style.transform = `perspective(1200px) rotateY(${rotation}deg)`;
+                rotationTimer = setTimeout(() => {
+                    rotation -= 90;
+                    updateRotation();
+                }, 3200);
+            }
+            if (rotatePrev) {
+                rotatePrev.addEventListener('click', () => {
+                    rotation += 90;
+                    clearTimeout(rotationTimer);
+                    updateRotation();
+                });
+            }
+            if (rotateNext) {
+                rotateNext.addEventListener('click', () => {
+                    rotation -= 90;
+                    clearTimeout(rotationTimer);
+                    updateRotation();
+                });
+            }
+            updateRotation();
 
             const fmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 
