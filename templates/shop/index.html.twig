@@ -635,11 +635,11 @@
                         {% endif %}
                     </div>
                     <div class="specs">
-                        <div class="size">
-                            <h3 class="subtitle">Pointure</h3>
-                            <div class="dropItems" id="size-list">
-                                {% for size in [38,39,40,41,42,43,44,45] %}
-                                    <div class="dropItem{% if size == 42 %} active{% endif %}" data-size="{{ size }}">{{ size }}</div>
+                        <div class="capacity">
+                            <h3 class="subtitle">Capacité</h3>
+                            <div class="dropItems" id="capacity-list">
+                                {% for capacity in ['20 L', '25 L', '30 L', '35 L'] %}
+                                    <div class="dropItem{% if capacity == '25 L' %} active{% endif %}" data-capacity="{{ capacity }}">{{ capacity }}</div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -790,7 +790,7 @@
             const plusBtn = document.getElementById('plus-btn');
             const minusBtn = document.getElementById('minus-btn');
             const stockMsg = document.getElementById('stock-msg');
-            const sizeList = document.getElementById('size-list');
+            const capacityList = document.getElementById('capacity-list');
             const heroMainImg = document.getElementById('hero-main-img');
             const thumbs = document.getElementById('thumbs');
             const prevBtn = document.getElementById('prev-btn');
@@ -847,13 +847,13 @@
                 if (badgeEl) badgeEl.textContent = totalCount;
             }
 
-            function addItem(name, price, qty = 1, size = null) {
+            function addItem(name, price, qty = 1, capacity = null) {
                 const items = loadCart();
-                const found = items.find(i => i.name === name && i.size === size);
+                const found = items.find(i => i.name === name && i.capacity === capacity);
                 if (found) {
                     found.qty += qty;
                 } else {
-                    items.push({ name, price, qty, size });
+                    items.push({ name, price, qty, capacity });
                 }
                 saveCart(items);
             }
@@ -871,9 +871,9 @@
             if (heroAdd && qtyInput) {
                 heroAdd.addEventListener('click', () => {
                     const qty = Math.max(1, Math.min(maxQuantity, parseInt(qtyInput.value, 10) || 1));
-                    const activeSize = sizeList ? sizeList.querySelector('.dropItem.active') : null;
-                    const size = activeSize ? activeSize.dataset.size : null;
-                    addItem(featuredName, featuredPrice, qty, size);
+                    const activeCapacity = capacityList ? capacityList.querySelector('.dropItem.active') : null;
+                    const capacity = activeCapacity ? activeCapacity.dataset.capacity : null;
+                    addItem(featuredName, featuredPrice, qty, capacity);
                     heroAdd.textContent = 'Ajouté !';
                     setTimeout(() => { heroAdd.textContent = 'Ajouter au panier'; }, 1000);
                 });
@@ -895,10 +895,10 @@
                 refreshHeroPrice();
             });
 
-            if (sizeList) {
-                sizeList.addEventListener('click', (e) => {
+            if (capacityList) {
+                capacityList.addEventListener('click', (e) => {
                     if (e.target.classList.contains('dropItem')) {
-                        sizeList.querySelectorAll('.dropItem').forEach(el => el.classList.remove('active'));
+                        capacityList.querySelectorAll('.dropItem').forEach(el => el.classList.remove('active'));
                         e.target.classList.add('active');
                     }
                 });
