@@ -718,7 +718,18 @@
         asset('assets/hero/Sacados5.png'),
         asset('assets/hero/Sacados6.png')
     ] %}
-    {% set lookbookItems = products|slice(0, 4) %}
+    {% set lookbookItems = products is not empty ? products|slice(0, 4) : [] %}
+    {% if lookbookItems is empty %}
+        {% set lookbookItems = [] %}
+        {% for img in heroImages|slice(0, 4) %}
+            {% set lookbookItems = lookbookItems|merge([{
+                name: 'Vue ' ~ loop.index,
+                description: 'Détail du sac — angle ' ~ loop.index,
+                price: heroFinalPrice,
+                imageUrl: img
+            }]) %}
+        {% endfor %}
+    {% endif %}
     <div class="page" id="top">
         <nav class="hero-nav">
             <div class="mainLogo">Eshop</div>
@@ -795,6 +806,29 @@
                 </div>
             </div>
         </section>
+        <div class="desc-block">
+            <div class="desc-header">
+                <div class="desc-title">Description du sac</div>
+                <button class="desc-toggle" id="desc-btn" type="button">Afficher</button>
+            </div>
+            <div class="desc-panel" id="desc-panel">
+                <p style="margin:0;">Sac à dos de compression sous vide, robuste et pratique pour le voyage quotidien ou le weekend.</p>
+                <dl>
+                    <dt>Marque</dt><dd>Fewchor</dd>
+                    <dt>Origine</dt><dd>Guangdong, Chine</dd>
+                    <dt>Genre</dt><dd>Unisexe</dd>
+                    <dt>Style</dt><dd>Casual</dd>
+                    <dt>Type</dt><dd>Softback, poignée souple</dd>
+                    <dt>Capacité</dt><dd>20–35 L</dd>
+                    <dt>Matière principale</dt><dd>Nylon</dd>
+                    <dt>Doublure</dt><dd>Nylon</dd>
+                    <dt>Système de portage</dt><dd>Bretelles air cushion</dd>
+                    <dt>Poches extérieures</dt><dd>Poche fente</dd>
+                    <dt>Fermeture</dt><dd>Zip</dd>
+                    <dt>Motif</dt><dd>Uni</dd>
+                </dl>
+            </div>
+        </div>
 
         <section class="lookbook-3d" aria-label="Galerie produit 3D">
             <p class="galleryTitle">Galerie 3D</p>
@@ -808,7 +842,7 @@
                           data-desc="{{ item.description ?: 'Description à venir' }}"
                           data-price="{{ finalPrice }}"
                           data-img="{{ item.imageUrl ?: fallbackImg }}">
-                        <img src="{{ item.imageUrl ?: fallbackImg }}" alt="Vue {{ loop.index }}">
+                        <img src="{{ item.imageUrl ?: fallbackImg }}" alt="Vue {{ loop.index }} - {{ item.name }}">
                     </span>
                 {% endfor %}
             </div>
