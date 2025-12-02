@@ -835,7 +835,8 @@
             <div class="image-container" id="rotating-lookbook">
                 {% for item in lookbookItems %}
                     {% set basePrice = item.price is not null ? item.price + 0 : defaultPrice %}
-                    {% set finalPrice = item.promoPercent is not null ? basePrice * (1 - item.promoPercent/100) : basePrice %}
+                    {% set promoPercent = item.promoPercent is defined and item.promoPercent is not null ? item.promoPercent + 0 : null %}
+                    {% set finalPrice = promoPercent is not null ? basePrice * (1 - promoPercent/100) : basePrice %}
                     {% set fallbackImg = heroImages[loop.index0 % heroImages|length] %}
                     <span style="--i: {{ loop.index0 }}"
                           data-name="{{ item.name }}"
