@@ -567,9 +567,12 @@
             width: min(260px, 65vw);
             height: min(260px, 65vw);
             transform-style: preserve-3d;
-            transform: perspective(1200px) rotateY(0deg);
-            transition: transform 0.7s;
+            transform: perspective(1200px) rotateX(-6deg) rotateY(var(--look-rot, 0deg));
+            transition: transform 0.7s ease;
             position: relative;
+        }
+        .lookbook-3d .image-container:hover {
+            transform: perspective(1200px) rotateX(-2deg) rotateY(var(--look-rot, 0deg)) scale(1.02);
         }
         .lookbook-3d .image-container span {
             position: absolute;
@@ -806,7 +809,6 @@
         </div>
 
         <section class="lookbook-3d" aria-label="Galerie produit 3D">
-            <p class="galleryTitle">Galerie 3D</p>
             <div class="image-container" id="rotating-lookbook">
                 {% for item in lookbookItems %}
                     {% set basePrice = item.price is not null ? item.price + 0 : defaultPrice %}
@@ -838,30 +840,6 @@
                     <p class="modal-price" id="lookbook-modal-price"></p>
                     <p class="modal-desc" id="lookbook-modal-desc"></p>
                 </div>
-            </div>
-        </div>
-
-        <div class="desc-block">
-            <div class="desc-header">
-                <div class="desc-title">Description du sac</div>
-                <button class="desc-toggle" id="desc-btn" type="button">Afficher</button>
-            </div>
-            <div class="desc-panel" id="desc-panel">
-                <p style="margin:0;">Sac à dos de compression sous vide, robuste et pratique pour le voyage quotidien ou le weekend.</p>
-                <dl>
-                    <dt>Marque</dt><dd>Fewchor</dd>
-                    <dt>Origine</dt><dd>Guangdong, Chine</dd>
-                    <dt>Genre</dt><dd>Unisexe</dd>
-                    <dt>Style</dt><dd>Casual</dd>
-                    <dt>Type</dt><dd>Softback, poignée souple</dd>
-                    <dt>Capacité</dt><dd>20–35 L</dd>
-                    <dt>Matière principale</dt><dd>Nylon</dd>
-                    <dt>Doublure</dt><dd>Nylon</dd>
-                    <dt>Système de portage</dt><dd>Bretelles air cushion</dd>
-                    <dt>Poches extérieures</dt><dd>Poche fente</dd>
-                    <dt>Fermeture</dt><dd>Zip</dd>
-                    <dt>Motif</dt><dd>Uni</dd>
-                </dl>
             </div>
         </div>
 
@@ -1025,7 +1003,7 @@
             // Rotating 3D lookbook
             function updateRotation() {
                 if (!rotatingEl || rotatingItems.length === 0) return;
-                rotatingEl.style.transform = `perspective(1200px) rotateY(${rotation}deg)`;
+                rotatingEl.style.setProperty('--look-rot', `${rotation}deg`);
                 rotationTimer = setTimeout(() => {
                     rotation -= 90;
                     updateRotation();
