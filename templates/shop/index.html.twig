@@ -20,37 +20,12 @@
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            background:
-                linear-gradient(160deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.35) 35%, rgba(37,99,235,0.25) 100%),
-                radial-gradient(circle at 20% 20%, rgba(34,211,238,0.12), transparent 25%),
-                radial-gradient(circle at 80% 0%, rgba(37,99,235,0.12), transparent 35%),
-                linear-gradient(180deg, #f7fbff 0%, #f5f8ff 100%);
+            background: #f7fbff;
             color: var(--text);
             font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
             line-height: 1.5;
             overflow-x: hidden;
             position: relative;
-        }
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(90deg, rgba(12, 18, 33, 0.02) 0, rgba(12, 18, 33, 0.02) 1px, transparent 1px, transparent 14px);
-            opacity: 0.8;
-            pointer-events: none;
-            animation: grid-move 28s linear infinite;
-            z-index: 0;
-        }
-        body::after {
-            content: "";
-            position: fixed;
-            inset: -20%;
-            background:
-                linear-gradient(160deg, rgba(15,23,42,0.8) 0%, rgba(15,23,42,0.45) 40%, rgba(15,23,42,0.05) 100%),
-                url('https://rafaelalucas.com/dailyui/12/assets/img01.png') center/cover no-repeat;
-            opacity: 0.28;
-            filter: blur(16px);
-            z-index: -1;
         }
         a { color: inherit; text-decoration: none; }
         .page {
