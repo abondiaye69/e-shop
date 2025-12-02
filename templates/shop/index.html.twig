@@ -732,12 +732,12 @@
             </div>
         </section>
 
-        <section class="lookbook-3d" aria-label="Lookbook produit 3D">
-            <p class="galleryTitle">Lookbook 3D</p>
+        <section class="lookbook-3d" aria-label="Galerie produit 3D">
+            <p class="galleryTitle">Galerie 3D</p>
             <div class="image-container" id="rotating-lookbook">
                 {% for img in heroImages|slice(0, 4) %}
                     <span style="--i: {{ loop.index0 }}">
-                        <img src="{{ img }}" alt="Lookbook angle {{ loop.index }}">
+                        <img src="{{ img }}" alt="Vue {{ loop.index }}">
                     </span>
                 {% endfor %}
             </div>
