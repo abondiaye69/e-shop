@@ -636,6 +636,69 @@
             border: 1px solid rgba(255,255,255,0.35);
         }
         .lookbook-3d .btn-3d:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(37,99,235,0.35); }
+        /* Modal fiche produit */
+        .lookbook-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .lookbook-modal.show { display: flex; }
+        .lookbook-modal .backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15,23,42,0.65);
+            backdrop-filter: blur(4px);
+        }
+        .lookbook-modal .modal-card {
+            position: relative;
+            background: #fff;
+            color: var(--text);
+            border-radius: 16px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+            width: min(760px, 92vw);
+            padding: 18px;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 16px;
+            z-index: 1;
+        }
+        @media (max-width: 768px) {
+            .lookbook-modal .modal-card { grid-template-columns: 1fr; }
+        }
+        .lookbook-modal img {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+            height: 100%;
+            min-height: 240px;
+        }
+        .lookbook-modal .modal-title {
+            margin: 0 0 6px 0;
+            font-size: 20px;
+            font-weight: 800;
+        }
+        .lookbook-modal .modal-price {
+            margin: 0 0 10px 0;
+            color: var(--accent-3);
+            font-weight: 700;
+        }
+        .lookbook-modal .modal-desc { margin: 0; color: var(--muted); }
+        .lookbook-modal .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: rgba(0,0,0,0.06);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-weight: 800;
+            color: var(--text);
+        }
     </style>
 {% endblock %}
 
@@ -655,6 +718,7 @@
         asset('assets/hero/Sacados5.png'),
         asset('assets/hero/Sacados6.png')
     ] %}
+    {% set lookbookItems = products|slice(0, 4) %}
     <div class="page" id="top">
         <nav class="hero-nav">
             <div class="mainLogo">Eshop</div>
@@ -734,10 +798,17 @@
 
         <section class="lookbook-3d" aria-label="Galerie produit 3D">
             <p class="galleryTitle">Galerie 3D</p>
-            <div class="image-container" id="rotating-lookbook">
-                {% for img in heroImages|slice(0, 4) %}
-                    <span style="--i: {{ loop.index0 }}">
-                        <img src="{{ img }}" alt="Vue {{ loop.index }}">
+            <h1>Découvrez notre collection</h1>
+                {% for item in lookbookItems %}
+                    {% set basePrice = item.price is not null ? item.price + 0 : defaultPrice %}
+                    {% set finalPrice = item.promoPercent is not null ? basePrice * (1 - item.promoPercent/100) : basePrice %}
+                    {% set fallbackImg = heroImages[loop.index0 % heroImages|length] %}
+                    <span style="--i: {{ loop.index0 }}"
+                          data-name="{{ item.name }}"
+                          data-desc="{{ item.description ?: 'Description à venir' }}"
+                          data-price="{{ finalPrice }}"
+                          data-img="{{ item.imageUrl ?: fallbackImg }}">
+                        <img src="{{ item.imageUrl ?: fallbackImg }}" alt="Vue {{ loop.index }}">
                     </span>
                 {% endfor %}
             </div>
@@ -746,6 +817,19 @@
                 <button class="btn-3d" type="button" id="lookbook-next">Suivant ⟳</button>
             </div>
         </section>
+
+        <div class="lookbook-modal" id="lookbook-modal" aria-hidden="true" role="dialog">
+            <div class="backdrop" id="lookbook-backdrop"></div>
+            <div class="modal-card">
+                <button class="modal-close" type="button" id="lookbook-close" aria-label="Fermer">×</button>
+                <img id="lookbook-modal-img" alt="Illustration produit">
+                <div class="modal-content">
+                    <p class="modal-title" id="lookbook-modal-title"></p>
+                    <p class="modal-price" id="lookbook-modal-price"></p>
+                    <p class="modal-desc" id="lookbook-modal-desc"></p>
+                </div>
+            </div>
+        </div>
 
         <div class="desc-block">
             <div class="desc-header">
@@ -884,6 +968,13 @@
             const rotatingEl = document.getElementById('rotating-lookbook');
             const rotatePrev = document.getElementById('lookbook-prev');
             const rotateNext = document.getElementById('lookbook-next');
+            const lookModal = document.getElementById('lookbook-modal');
+            const lookBackdrop = document.getElementById('lookbook-backdrop');
+            const lookClose = document.getElementById('lookbook-close');
+            const lookImg = document.getElementById('lookbook-modal-img');
+            const lookTitle = document.getElementById('lookbook-modal-title');
+            const lookPrice = document.getElementById('lookbook-modal-price');
+            const lookDesc = document.getElementById('lookbook-modal-desc');
 
             const featuredName = "{{ (featured and featured.name ? featured.name : fallbackNamePlain)|e('js') }}";
             const featuredPrice = parseFloat("{{ heroFinalPrice|number_format(2, '.', '') }}") || 0;
@@ -945,6 +1036,35 @@
                 });
             }
             updateRotation();
+
+            function openLookModal(data) {
+                if (!lookModal || !data) return;
+                lookModal.classList.add('show');
+                lookModal.setAttribute('aria-hidden', 'false');
+                if (lookImg) lookImg.src = data.img || '';
+                if (lookImg) lookImg.alt = data.name || 'Produit';
+                if (lookTitle) lookTitle.textContent = data.name || 'Produit';
+                if (lookPrice) lookPrice.textContent = fmt.format(parseFloat(data.price || '0') || 0);
+                if (lookDesc) lookDesc.textContent = data.desc || '';
+            }
+            function closeLookModal() {
+                if (!lookModal) return;
+                lookModal.classList.remove('show');
+                lookModal.setAttribute('aria-hidden', 'true');
+            }
+            rotatingItems.forEach(span => {
+                span.addEventListener('click', () => {
+                    openLookModal({
+                        name: span.dataset.name,
+                        desc: span.dataset.desc,
+                        price: span.dataset.price,
+                        img: span.dataset.img
+                    });
+                });
+            });
+            if (lookBackdrop) lookBackdrop.addEventListener('click', closeLookModal);
+            if (lookClose) lookClose.addEventListener('click', closeLookModal);
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLookModal(); });
 
             const fmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 
