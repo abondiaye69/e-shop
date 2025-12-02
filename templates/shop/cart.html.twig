@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panier{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body { margin:0; font-family:"Helvetica Neue", Arial, sans-serif; background:#f7f8fa; color:#0d1117; }
+        .page { max-width: 1100px; margin: 0 auto; padding: 24px 16px 72px; }
+        h1 { margin:0 0 12px 0; }
+        .grid { display:grid; gap:18px; grid-template-columns: 2fr 1fr; align-items:start; }
+        .card { background:#fff; border:1px solid rgba(0,0,0,0.05); border-radius:14px; padding:16px; box-shadow:0 10px 24px rgba(0,0,0,0.04); }
+        .table-wrap { overflow-x:auto; }
+        table { width:100%; border-collapse: collapse; min-width: 520px; }
+        th, td { padding:10px 6px; text-align:left; border-bottom:1px solid rgba(0,0,0,0.05); }
+        th { color:#6b7280; font-weight:600; font-size:13px; }
+        td { font-size:14px; }
+        .muted { color:#6b7280; }
+        .summary { display:grid; gap:10px; }
+        .row { display:flex; justify-content:space-between; }
+        .total { font-weight:800; font-size:18px; }
+        .cta { background:#111827; color:#fff; padding:12px 14px; border:none; border-radius:10px; font-weight:700; width:100%; cursor:pointer; transition:transform 120ms ease, box-shadow 120ms ease; }
+        .cta:hover { transform:translateY(-1px); box-shadow:0 10px 24px rgba(0,0,0,0.12); }
+        a { color:#2563eb; text-decoration:none; }
+        .empty { padding:12px; color:#6b7280; }
+        .remove { color:#b91c1c; cursor:pointer; font-weight:700; }
+        .user-pill { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; background:#eef2ff; color:#1d4ed8; font-weight:700; border:1px solid rgba(37,99,235,0.2); }
+        @media (max-width: 720px) {
+            .grid { grid-template-columns: 1fr; }
+            .card { padding:14px; }
+            table { min-width: 100%; font-size:13px; }
+            th, td { padding:8px 6px; }
+            .summary { position:sticky; bottom:8px; box-shadow:0 18px 30px rgba(0,0,0,0.12); border-radius:12px; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+            <a href="{{ path('shop_home') }}" style="text-decoration:none; color:#2563eb; font-weight:600;">← Retour boutique</a>
+            <a href="{{ path('shop_account') }}" style="text-decoration:none; color:#2563eb; font-weight:600;">Mon compte</a>
+            {% if app.user %}
+                <span class="user-pill">Bonjour {{ app.user.userIdentifier ?? app.user.email ?? app.user.username ?? '' }}</span>
+            {% endif %}
+        </div>
+        <h1>Panier</h1>
+        <p class="muted">Aperçu de votre sélection.</p>
+
+        <div class="grid">
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Qté</th>
+                                <th>Prix</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-body">
+                            <tr><td colspan="4" class="empty">Panier vide.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="summary">
+                    <div class="row"><span>Sous-total</span><span id="subtotal">{{ subtotal|number_format(2, '.', ' ') }} €</span></div>
+                    <div class="row"><span>Livraison</span><span id="shipping">{{ shipping|number_format(2, '.', ' ') }} €</span></div>
+                    <div class="row total"><span>Total</span><span id="total">{{ total|number_format(2, '.', ' ') }} €</span></div>
+                    <a class="cta" href="{{ path('checkout') }}">Valider la commande</a>
+                    <a href="{{ path('shop_home') }}">← Continuer mes achats</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            const body = document.getElementById('cart-body');
+            const subtotalEl = document.getElementById('subtotal');
+            const shippingEl = document.getElementById('shipping');
+            const totalEl = document.getElementById('total');
+            const defaultPrice = 39;
+            const shipping = 8;
+            const fmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+
+            function loadCart() {
+                try {
+                    return JSON.parse(localStorage.getItem('cartItems') || '[]');
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            function saveCart(items) {
+                localStorage.setItem('cartItems', JSON.stringify(items));
+            }
+
+            function removeItem(name) {
+                const items = loadCart().filter(i => i.name !== name);
+                saveCart(items);
+                return items;
+            }
+
+            function render() {
+                const fallbackName = 'Sac à dos étanche';
+                const items = loadCart();
+                if (!items.length) {
+                    body.innerHTML = '<tr><td colspan="4" class="empty">Panier vide.</td></tr>';
+                    subtotalEl.textContent = fmt.format(0);
+                    shippingEl.textContent = fmt.format(shipping);
+                    totalEl.textContent = fmt.format(shipping);
+                    return;
+                }
+
+                body.innerHTML = '';
+                let subtotal = 0;
+
+                items.forEach(item => {
+                    const row = document.createElement('tr');
+                    const unit = (item.price || defaultPrice);
+                    const price = unit * (item.qty || 0);
+                    const nameDisplay = item.name && item.name !== 'Produit phare' ? item.name : fallbackName;
+                    subtotal += price;
+                    row.innerHTML = `
+                        <td>${nameDisplay}</td>
+                        <td>${item.qty}</td>
+                        <td>${fmt.format(price)}</td>
+                        <td><span class="remove" data-name="${item.name}">✕</span></td>
+                    `;
+                    body.appendChild(row);
+                });
+
+                subtotalEl.textContent = fmt.format(subtotal);
+                shippingEl.textContent = fmt.format(shipping);
+                totalEl.textContent = fmt.format(subtotal + shipping);
+
+                body.querySelectorAll('.remove').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const updated = removeItem(btn.dataset.name || '');
+                        render();
+                    });
+                });
+            }
+
+            render();
+        })();
+    </script>
+{% endblock %}

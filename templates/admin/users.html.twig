@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin — Utilisateurs{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body { margin:0; font-family:"Helvetica Neue", Arial, sans-serif; background:#f8f9fb; color:#0f172a; }
+        .wrapper { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+        header { display:flex; justify-content: space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+        h1 { margin:0; font-size:24px; }
+        a { color: inherit; text-decoration: none; }
+        .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius: 999px; background:#0f172a; color:#fff; font-weight:700; }
+        .panel { background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:12px; padding:16px; }
+        table { width:100%; border-collapse: collapse; }
+        th, td { padding:10px 8px; border-bottom:1px solid rgba(0,0,0,0.05); text-align:left; }
+        th { font-size:13px; color:#6b7280; font-weight:700; text-transform: uppercase; letter-spacing:0.02em; }
+        .muted { color:#6b7280; font-size:14px; }
+        .role { display:inline-block; padding:4px 8px; border-radius:8px; background:#eef2ff; color:#312e81; font-size:12px; font-weight:700; border:1px solid #c7d2fe; }
+        @media (max-width: 760px) {
+            .table-wrapper { overflow-x:auto; }
+            th, td { white-space: nowrap; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+    <header>
+        <h1>Utilisateurs</h1>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a class="pill" href="{{ path('admin_dashboard') }}">← Tableau de bord</a>
+            <a class="pill" href="{{ path('shop_home') }}" style="background:#111827;">Voir la boutique</a>
+        </div>
+    </header>
+
+    <div class="panel table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>#{{ user.id }}</td>
+                        <td>
+                            {% if user.firstName or user.lastName %}
+                                {{ user.firstName }} {{ user.lastName }}
+                            {% else %}
+                                <span class="muted">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% for role in user.roles %}
+                                <span class="role">{{ role }}</span>
+                            {% else %}
+                                <span class="muted">ROLE_USER</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="muted">Aucun utilisateur pour l’instant.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

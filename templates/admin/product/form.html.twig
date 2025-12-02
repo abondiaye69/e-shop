@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin — {{ is_edit ? 'Éditer' : 'Nouveau' }} produit{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body { margin:0; font-family:"Helvetica Neue", Arial, sans-serif; background:#f8f9fb; color:#0f172a; }
+        .wrapper { max-width: 760px; margin: 0 auto; padding: 32px 20px; }
+        header { display:flex; justify-content: space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+        h1 { margin:0; font-size:24px; }
+        a { color: inherit; text-decoration: none; }
+        .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius: 999px; background:#0f172a; color:#fff; font-weight:700; }
+        .panel { background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:12px; padding:16px; }
+        label { font-weight:700; font-size:14px; display:block; margin-bottom:6px; }
+        input, textarea { width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); background:#f9fafb; }
+        textarea { resize: vertical; }
+        .row { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .actions { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+        .btn-primary { padding:10px 14px; border-radius:12px; background:#2563eb; color:#fff; border:none; font-weight:700; }
+        .btn-secondary { padding:10px 14px; border-radius:12px; background:#e5e7eb; color:#111827; border:1px solid #d1d5db; font-weight:700; }
+        .help { color:#6b7280; font-size:13px; margin-top:4px; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+    <header>
+        <h1>{{ is_edit ? 'Éditer le produit' : 'Nouveau produit' }}</h1>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a class="pill" href="{{ path('admin_product_index') }}">← Liste des produits</a>
+            <a class="pill" href="{{ path('shop_home') }}" style="background:#111827;">Voir la boutique</a>
+        </div>
+    </header>
+
+    <div class="panel">
+        {{ form_start(form) }}
+            <div class="row">
+                <div>
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.price) }}
+                    {{ form_widget(form.price) }}
+                    {{ form_errors(form.price) }}
+                </div>
+                <div>
+                    {{ form_label(form.promoPercent) }}
+                    {{ form_widget(form.promoPercent) }}
+                    <div class="help">Laisse vide s’il n’y a pas de promo.</div>
+                    {{ form_errors(form.promoPercent) }}
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    {{ form_label(form.badge) }}
+                    {{ form_widget(form.badge) }}
+                    <div class="help">Ex: Nouveau, Best-seller, Promo…</div>
+                    {{ form_errors(form.badge) }}
+                </div>
+                <div>
+                    {{ form_label(form.imageUrl) }}
+                    {{ form_widget(form.imageUrl) }}
+                    <div class="help">URL directe vers l’image.</div>
+                    {{ form_errors(form.imageUrl) }}
+                </div>
+            </div>
+            <div>
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="actions">
+                <button class="btn-primary" type="submit">{{ is_edit ? 'Enregistrer' : 'Créer' }}</button>
+                <a class="btn-secondary" href="{{ path('admin_product_index') }}">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

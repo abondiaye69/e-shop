@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body { margin:0; font-family:"Helvetica Neue", Arial, sans-serif; background:#f7f8fa; color:#0d1117; }
+        .page { max-width: 900px; margin: 0 auto; padding: 32px 20px 64px; }
+        h1 { margin:0 0 12px 0; }
+        .card { background:#fff; border:1px solid rgba(0,0,0,0.05); border-radius:14px; padding:16px; }
+        .grid { display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        label { font-weight:600; font-size:14px; }
+        input, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); font-size:14px; }
+        textarea { min-height:90px; }
+        button { background:#111827; color:#fff; padding:12px 14px; border:none; border-radius:10px; font-weight:700; cursor:pointer; }
+        .muted { color:#6b7280; font-size:13px; margin:0 0 10px 0; }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+            <a href="{{ path('shop_home') }}" style="text-decoration:none; color:#2563eb; font-weight:600;">← Retour boutique</a>
+            <a href="{{ path('shop_cart') }}" style="text-decoration:none; color:#2563eb; font-weight:600;">Voir mon panier</a>
+        </div>
+        <h1>Mon compte</h1>
+        <p class="muted">Modifie tes informations de livraison et tes coordonnées.</p>
+
+        <div class="card">
+            {% if error %}
+                <div style="color:#b91c1c; background:#fee2e2; border:1px solid #fecdd3; padding:10px 12px; border-radius:10px; font-size:13px; margin-bottom:10px;">{{ error }}</div>
+            {% endif %}
+            {% if saved %}
+                <div style="color:#166534; background:#ecfdf3; border:1px solid #bbf7d0; padding:10px 12px; border-radius:10px; font-size:13px; margin-bottom:10px;">Profil mis à jour.</div>
+            {% endif %}
+            <form method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('account_update') }}">
+                <div class="grid">
+                    <div>
+                        <label for="firstName">Prénom</label>
+                        <input id="firstName" name="firstName" placeholder="Prénom" value="{{ app.user ? app.user.firstName : '' }}">
+                    </div>
+                    <div>
+                        <label for="lastName">Nom</label>
+                        <input id="lastName" name="lastName" placeholder="Nom" value="{{ app.user ? app.user.lastName : '' }}">
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" placeholder="email@example.com" value="{{ app.user ? app.user.email : '' }}">
+                    </div>
+                    <div>
+                        <label for="phone">Téléphone</label>
+                        <input id="phone" name="phone" placeholder="+33 6 00 00 00 00" value="{{ app.user ? app.user.phone : '' }}">
+                    </div>
+                    <div>
+                        <label for="address">Adresse</label>
+                        <input id="address" name="address" placeholder="12 rue des Lilas" value="{{ app.user ? app.user.address : '' }}">
+                    </div>
+                    <div>
+                        <label for="city">Ville</label>
+                        <input id="city" name="city" placeholder="Paris" value="{{ app.user ? app.user.city : '' }}">
+                    </div>
+                    <div>
+                        <label for="postalCode">Code postal</label>
+                        <input id="postalCode" name="postalCode" placeholder="75000" value="{{ app.user ? app.user.postalCode : '' }}">
+                    </div>
+                    <div>
+                        <label for="country">Pays</label>
+                        <input id="country" name="country" placeholder="France" value="{{ app.user ? app.user.country : '' }}">
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <label for="note">Instructions de livraison</label>
+                    <textarea id="note" name="note" placeholder="Digicode, étage, plage horaire..."></textarea>
+                </div>
+                <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="submit">Enregistrer</button>
+                    <a href="{{ path('shop_cart') }}" style="color:#2563eb; text-decoration:none; font-weight:600;">Voir mon panier</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

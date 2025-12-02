@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body { margin:0; font-family:"Helvetica Neue", Arial, sans-serif; background:#f5f6fb; color:#0f172a; }
+        .wrap { max-width:520px; margin:80px auto; background:#fff; border:1px solid rgba(0,0,0,0.05); border-radius:14px; padding:28px; box-shadow:0 18px 40px rgba(0,0,0,0.05); }
+        h1 { margin:0 0 12px 0; font-size:24px; }
+        form { display:grid; gap:12px; margin-top:12px; }
+        label { font-weight:600; font-size:14px; }
+        input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); font-size:14px; }
+        button { background:#111827; color:#fff; padding:12px 14px; border:none; border-radius:10px; font-weight:700; cursor:pointer; }
+        .muted { color:#6b7280; font-size:13px; margin:0; }
+        .error { color:#b91c1c; background:#fee2e2; border:1px solid #fecdd3; padding:10px 12px; border-radius:10px; font-size:13px; margin-top:10px; }
+        .info { color:#166534; background:#ecfdf3; border:1px solid #bbf7d0; padding:10px 12px; border-radius:10px; font-size:13px; margin-top:10px; }
+        a { color:#2563eb; text-decoration:none; }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="wrap">
+        <h1>Créer un compte</h1>
+        <p class="muted">Compte client pour suivre vos commandes.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        {% if success %}
+            <div class="info">Compte créé. Vous pouvez vous connecter.</div>
+        {% endif %}
+
+        <form method="post">
+            <div>
+                <label for="firstName">Prénom</label>
+                <input id="firstName" name="firstName" value="{{ firstName }}">
+            </div>
+            <div>
+                <label for="lastName">Nom</label>
+                <input id="lastName" name="lastName" value="{{ lastName }}">
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required value="{{ email }}">
+            </div>
+            <div>
+                <label for="password">Mot de passe (8+)</label>
+                <input id="password" name="password" type="password" required minlength="8">
+            </div>
+            <div>
+                <label for="confirm">Confirmer le mot de passe</label>
+                <input id="confirm" name="confirm" type="password" required minlength="8">
+            </div>
+            <button type="submit">Créer mon compte</button>
+        </form>
+        <p class="muted" style="margin-top:12px;">Déjà un compte ? <a href="{{ path('login') }}">Connexion</a></p>
+    </div>
+{% endblock %}

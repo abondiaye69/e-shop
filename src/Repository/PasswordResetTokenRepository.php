@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\PasswordResetToken;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+/**
+ * @extends ServiceEntityRepository<PasswordResetToken>
+ */
+class PasswordResetTokenRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, PasswordResetToken::class);
+    }
+
+    public function save(PasswordResetToken $token, bool $flush = false): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($token);
+        if ($flush) {
+            $em->flush();
+        }
+    }
+}
